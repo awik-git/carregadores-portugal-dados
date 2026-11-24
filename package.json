@@ -1,0 +1,12 @@
+{
+  "name": "carregadores-portugal-dados",
+  "private": true,
+  "type": "module",
+  "description": "Dados abertos MOBI.E (NAP Portugal) reduzidos a JSON compacto para a app Carregadores Portugal.",
+  "engines": { "node": ">=24" },
+  "scripts": {
+    "static": "node src/build.ts static",
+    "status": "node src/build.ts status"
+  },
+  "dependencies": { "saxes": "^6.0.0" }
+}
