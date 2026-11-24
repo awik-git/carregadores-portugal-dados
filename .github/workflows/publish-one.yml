@@ -1,0 +1,38 @@
+# Shared steps: build one feed and replace the single commit on its data branch (the repo never grows).
+name: Publicar (passos comuns)
+
+on:
+  workflow_call:
+    inputs:
+      kind: { type: string, required: true }
+      branch: { type: string, required: true }
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci --omit=dev
+      - name: Previous published data
+        run: |
+          mkdir -p prev
+          if git fetch -q --depth 1 origin "${{ inputs.branch }}" 2>/dev/null; then
+            git show "origin/${{ inputs.branch }}:meta.json" > prev/meta.json 2>/dev/null || true
+          fi
+      - run: node src/build.ts "${{ inputs.kind }}"
+      - name: Publish
+        run: |
+          if [ -f out/.skip ]; then echo "Nothing to publish."; exit 0; fi
+          cd out
+          git init -q -b "${{ inputs.branch }}"
+          git add -A
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -q -m "${{ inputs.kind }} $(date -u +%FT%TZ)"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" "${{ inputs.branch }}"

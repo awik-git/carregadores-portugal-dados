@@ -1,0 +1,21 @@
+# Charger infrastructure: MOBI.E static feed -> data-chargers branch (chargers.json + meta.json), once a day.
+name: Lista de carregadores
+
+on:
+  schedule:
+    - cron: '23 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: chargers
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    uses: ./.github/workflows/publish-one.yml
+    with:
+      kind: static
+      branch: data-chargers
