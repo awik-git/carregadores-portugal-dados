@@ -30,8 +30,8 @@ jobs:
     env:
       KIND: ${{ github.event.schedule == '20 4 * * *' && 'static' || inputs.kind || 'status' }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           cache: npm
